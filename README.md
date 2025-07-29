@@ -1,6 +1,6 @@
-# Aplicación E-commerce - Proyecto Final Talento Tech
+# API E-commerce - Proyecto Final Talento Tech
 
-Este repositorio contiene el **proyecto final** desarrollado para el programa **Talento Tech**, profesora: Gisela Gonzales. 
+Este repositorio contiene el **proyecto final** desarrollado para el programa **Talento Tech**, profesora: Gisela Gonzalez. 
 El objetivo principal fue crear una aplicación de e-commerce funcional.
 
 **Funcionalidades clave:**
