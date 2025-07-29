@@ -1,27 +1,23 @@
 import { useEffect, useState } from "react";
 import { fetchProducts } from "../services/productService";
+import ProductCard from "../components/ProductCard"; // <-- Importa el componente ProductCard
 
-function Products() {
-  const [productos, setProductos] = useState([]);
-
-  useEffect(() => {
-    fetchProducts().then(data => setProductos(data));
-  }, []);
+function Products({ products }) {
+  // Define la función para agregar productos al carrito
+  const addToCart = (product) => {
+    console.log(`Adding ${product.nombre} to cart`);
+    // Lógica para actualizar el estado del carrito
+  };
 
   return (
     <div>
-      <h2>Menú</h2>
-      <div className="grid">
-        {productos.map((p) => (
-          <div key={p.id} className="card">
-            <h3>{p.nombre}</h3>
-            <p>{p.descripcion}</p>
-            <strong>${p.precio}</strong>
-          </div>
-        ))}
-      </div>
+      {products.map(product => (
+        // Pasa la función `addToCart` como una prop
+        <ProductCard key={product.id} product={product} addToCart={addToCart} />
+      ))}
     </div>
   );
 }
+
 
 export default Products;

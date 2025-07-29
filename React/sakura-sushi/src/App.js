@@ -63,7 +63,7 @@ const App = () => {
       loadProductsByCategory(selectedCategory);
     }
   }, [selectedCategory, searchTerm]);
-  
+
   // Funciones auxiliares
   const handleCategoryChange = (category) => {
     setSelectedCategory(category);
@@ -109,8 +109,14 @@ const App = () => {
       <div className="container">
         <div className="d-flex justify-content-between align-items-center">
           <div className="d-flex align-items-center">
-            <h1 className="h3 mb-0 me-3">🍣 Sakura Sushi</h1>
-            <p className="d-none d-md-block text-white-50">Auténtico sabor japonés</p>
+            <h1
+              className="h3 mb-0 me-3 user-select-none"
+              style={{ cursor: 'pointer' }}
+              onClick={() => setActiveSection('menu')}
+              title="Ir al inicio"
+            >
+              🍣 Sakura Sushi
+            </h1>
           </div>
           <div className="d-flex align-items-center">
             <button
@@ -118,6 +124,12 @@ const App = () => {
               className="btn btn-outline-light me-3"
             >
               Nosotros
+            </button>
+            <button
+              onClick={() => setActiveSection('contact')}
+              className="btn btn-outline-light me-3"
+            >
+              Contacto
             </button>
             <button
               onClick={() => setActiveSection('cart')}
@@ -163,33 +175,65 @@ const App = () => {
     </nav>
   );
 
-  const ProductCard = ({ product }) => (
-    <div className="card shadow-sm h-100">
-      <div className="card-body text-center d-flex flex-column justify-content-between">
-        <div>
-          <div className="display-4 mb-2">{product.image || '🍣'}</div>
-          <h3 className="card-title h5 text-dark">{product.nombre}</h3>
-          <p className="card-text text-muted small">{product.descripcion}</p>
-        </div>
+  const ProductCard = ({ product, addToCart }) => {
+    // Normalizar producto para compatibilidad con el carrito
+    const normalizedProduct = {
+      id: product.id,
+      name: product.nombre, // ← Aquí está bien
+      price: product.precioBase, // ← Aquí está bien
+      image: product.image || '🍣',
+      descripcion: product.descripcion,
+      rating: product.rating || 4.5,
+      // Agregamos cantidad inicial
+      quantity: 1,
+      ...product
+    };
 
-        <div className="d-flex align-items-center justify-content-center mb-3">
-          <Star className="text-warning me-1" size={16} />
-          <span className="text-muted small">{product.rating || 4.5}</span>
-        </div>
+    const handleAddToCart = () => {
+      console.log('Adding to cart:', normalizedProduct);
+      console.log('addToCart function:', typeof addToCart);
 
-        <div className="d-flex justify-content-between align-items-center">
-          <span className="fs-4 fw-bold text-danger">${product.precioBase}</span>
-          <button
-            onClick={() => addToCart(product)}
-            className="btn btn-danger btn-sm d-flex align-items-center"
-          >
-            <Plus size={16} className="me-1" />
-            <span>Agregar</span>
-          </button>
+      if (typeof addToCart === 'function') {
+        try {
+          addToCart(normalizedProduct);
+          console.log('✅ Producto añadido exitosamente');
+        } catch (error) {
+          console.error('❌ Error al añadir producto:', error);
+        }
+      } else {
+        console.error('❌ addToCart is not a function:', addToCart);
+      }
+    };
+
+    return (
+      <div className="card shadow-sm h-100">
+        <div className="card-body text-center d-flex flex-column justify-content-between">
+          <div>
+            <div className="display-4 mb-2">{normalizedProduct.image}</div>
+            <h3 className="card-title h5 text-dark">{product.nombre}</h3>
+            <p className="card-text text-muted small">{product.descripcion}</p>
+          </div>
+
+          <div className="d-flex align-items-center justify-content-center mb-3">
+            <Star className="text-warning me-1" size={16} />
+            <span className="text-muted small">{normalizedProduct.rating}</span>
+          </div>
+
+          <div className="d-flex justify-content-between align-items-center">
+            <span className="fs-4 fw-bold text-danger">${product.precioBase}</span>
+            <button
+              onClick={handleAddToCart}
+              className="btn btn-danger btn-sm d-flex align-items-center"
+              type="button"
+            >
+              <Plus size={16} className="me-1" />
+              <span>Agregar</span>
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const MenuSection = () => {
     const ErrorMessage = ({ message, onRetry }) => (
@@ -271,7 +315,7 @@ const App = () => {
           <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             {products.map(product => (
               <div key={product.id} className="col">
-                <ProductCard product={product} />
+                <ProductCard product={product} addToCart={addToCart} />
               </div>
             ))}
           </div>
@@ -280,107 +324,111 @@ const App = () => {
     );
   };
 
-  const CartSection = () => (
-    <div className="container my-5">
-      <h2 className="display-5 fw-bold text-dark mb-4">Tu Pedido</h2>
+  const CartSection = () => {
+    const shippingCost = 490; // Costo de envío consistente
 
-      {cart.length === 0 ? (
-        <div className="text-center py-5">
-          <ShoppingCart size={64} className="text-muted mb-3" />
-          <p className="text-muted h5">Tu carrito está vacío</p>
-          <button
-            onClick={() => setActiveSection('menu')}
-            className="btn btn-danger mt-3"
-          >
-            Ver Menú
-          </button>
-        </div>
-      ) : (
-        <div className="row g-4">
-          <div className="col-lg-8">
-            <div className="list-group">
-              {cart.map(item => (
-                <div key={item.id} className="list-group-item d-flex justify-content-between align-items-center">
-                  <div className="d-flex align-items-center">
-                    <div className="fs-3 me-3">{item.image || '🍣'}</div>
-                    <div>
-                      <h3 className="h6 mb-0">{item.name}</h3>
-                      <p className="text-muted small mb-0">${item.price}</p>
+    return (
+      <div className="container my-5">
+        <h2 className="display-5 fw-bold text-dark mb-4">Tu Pedido</h2>
+
+        {cart.length === 0 ? (
+          <div className="text-center py-5">
+            <ShoppingCart size={64} className="text-muted mb-3" />
+            <p className="text-muted h5">Tu carrito está vacío</p>
+            <button
+              onClick={() => setActiveSection('menu')}
+              className="btn btn-danger mt-3"
+            >
+              Ver Menú
+            </button>
+          </div>
+        ) : (
+          <div className="row g-4">
+            <div className="col-lg-8">
+              <div className="list-group">
+                {cart.map(item => (
+                  <div key={item.id} className="list-group-item d-flex justify-content-between align-items-center">
+                    <div className="d-flex align-items-center">
+                      <div className="fs-3 me-3">{item.image || '🍣'}</div>
+                      <div>
+                        <h3 className="h6 mb-0">{item.name}</h3>
+                        <p className="text-muted small mb-0">${item.price}</p>
+                      </div>
+                    </div>
+                    <div className="d-flex align-items-center">
+                      <button
+                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        className="btn btn-outline-secondary btn-sm"
+                      >
+                        <Minus size={16} />
+                      </button>
+                      <span className="mx-2 fw-bold">{item.quantity}</span>
+                      <button
+                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        className="btn btn-outline-secondary btn-sm"
+                      >
+                        <Plus size={16} />
+                      </button>
+                      <button
+                        onClick={() => removeFromCart(item.id)}
+                        className="btn btn-link text-danger ms-3"
+                      >
+                        Eliminar
+                      </button>
                     </div>
                   </div>
-                  <div className="d-flex align-items-center">
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      className="btn btn-outline-secondary btn-sm"
-                    >
-                      <Minus size={16} />
-                    </button>
-                    <span className="mx-2 fw-bold">{item.quantity}</span>
-                    <button
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="btn btn-outline-secondary btn-sm"
-                    >
-                      <Plus size={16} />
-                    </button>
-                    <button
-                      onClick={() => removeFromCart(item.id)}
-                      className="btn btn-link text-danger ms-3"
-                    >
-                      Eliminar
-                    </button>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
 
-          <div className="col-lg-4">
-            <div className="card shadow-sm sticky-top" style={{ top: '1rem' }}>
-              <div className="card-body">
-                <h3 className="card-title h5 mb-3">Resumen del Pedido</h3>
-                <ul className="list-group list-group-flush mb-3">
-                  <li className="list-group-item d-flex justify-content-between">
-                    <span>Subtotal:</span>
-                    <span>${getTotalPrice()}</span>
-                  </li>
-                  <li className="list-group-item d-flex justify-content-between">
-                    <span>Envío:</span>
-                    <span>$2.99</span>
-                  </li>
-                  <li className="list-group-item d-flex justify-content-between fw-bold">
-                    <span>Total:</span>
-                    <span>{(parseFloat(getTotalPrice()) + 2.99).toFixed(2)}</span>
-                  </li>
-                </ul>
-                <button
-                  onClick={() => handleProcessOrder({
-                    name: 'Cliente Demo',
-                    email: 'demo@email.com',
-                    phone: '123456789',
-                    address: 'Dirección demo'
-                  })}
-                  disabled={orderLoading}
-                  className="btn btn-danger w-100 d-flex align-items-center justify-content-center"
-                >
-                  {orderLoading ? (
-                    <>
-                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                      <span>Procesando...</span>
-                    </>
-                  ) : (
-                    <>
-                      <CreditCard size={20} className="me-2" />
-                      <span>Proceder al Pago</span>
-                    </>
-                  )}
-                </button>
+            <div className="col-lg-4">
+              <div className="card shadow-sm sticky-top" style={{ top: '1rem' }}>
+                <div className="card-body">
+                  <h3 className="card-title h5 mb-3">Resumen del Pedido</h3>
+                  <ul className="list-group list-group-flush mb-3">
+                    <li className="list-group-item d-flex justify-content-between">
+                      <span>Subtotal:</span>
+                      <span>${getTotalPrice()}</span>
+                    </li>
+                    <li className="list-group-item d-flex justify-content-between">
+                      <span>Envío:</span>
+                      <span>${shippingCost}</span>
+                    </li>
+                    <li className="list-group-item d-flex justify-content-between fw-bold">
+                      <span>Total:</span>
+                      <span>${(parseFloat(getTotalPrice()) + shippingCost).toFixed(2)}</span>
+                    </li>
+                  </ul>
+                  <button
+                    onClick={() => handleProcessOrder({
+                      name: 'Cliente Demo',
+                      email: 'demo@email.com',
+                      phone: '123456789',
+                      address: 'Dirección demo'
+                    })}
+                    disabled={orderLoading}
+                    className="btn btn-danger w-100 d-flex align-items-center justify-content-center"
+                  >
+                    {orderLoading ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        <span>Procesando...</span>
+                      </>
+                    ) : (
+                      <>
+                        <CreditCard size={20} className="me-2" />
+                        <span>Proceder al Pago</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
-  );
+        )}
+      </div>
+    );
+  };
 
   const AboutSection = () => (
     <div className="container my-5">
@@ -455,7 +503,7 @@ const App = () => {
                   </li>
                   <li className="list-group-item d-flex align-items-center">
                     <Clock className="text-danger me-2" size={20} />
-                    <span>Lun-Dom: 12:00 - 23:00</span>
+                    <span>Mar-Dom: 19:00 - 00:00</span>
                   </li>
                 </ul>
               </div>
