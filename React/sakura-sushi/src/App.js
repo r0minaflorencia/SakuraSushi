@@ -179,8 +179,8 @@ const App = () => {
     // Normalizar producto para compatibilidad con el carrito
     const normalizedProduct = {
       id: product.id,
-      name: product.nombre, // ← Aquí está bien
-      price: product.precioBase, // ← Aquí está bien
+      name: product.nombre,
+      price: product.precioBase,
       image: product.image || '🍣',
       descripcion: product.descripcion,
       rating: product.rating || 4.5,
@@ -236,6 +236,65 @@ const App = () => {
   };
 
   const MenuSection = () => {
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [newProduct, setNewProduct] = useState({
+      nombre: '',
+      descripcion: '',
+      precioBase: '',
+      categoria: 'Sushi',
+      image: '🍣'
+    });
+    const [addingProduct, setAddingProduct] = useState(false);
+
+    const handleAddProduct = async (e) => {
+      e.preventDefault();
+      setAddingProduct(true);
+
+      try {
+        // Aquí harías la llamada a tu API para crear el producto
+        const productToAdd = {
+          ...newProduct,
+          price: parseFloat(newProduct.price),
+          id: Date.now() // Temporal hasta que el backend genere el ID
+        };
+
+        // Simular llamada a API (reemplaza con tu función real)
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // Resetear formulario
+        setNewProduct({
+          nombre: '',
+          descripcion: '',
+          precioBase: '',
+          categoria: 'Sushi',
+          image: '🍣'
+        });
+
+        setShowAddForm(false);
+
+        // Refrescar productos
+        if (refetchProducts) {
+          refetchProducts();
+        }
+
+        // Mostrar mensaje de éxito (opcional)
+        alert('Producto agregado exitosamente!');
+
+      } catch (error) {
+        console.error('Error al agregar producto:', error);
+        alert('Error al agregar el producto. Intenta nuevamente.');
+      } finally {
+        setAddingProduct(false);
+      }
+    };
+
+    const handleInputChange = (field, value) => {
+      setNewProduct(prev => ({
+        ...prev,
+        [field]: value
+      }));
+    };
+
     const ErrorMessage = ({ message, onRetry }) => (
       <div className="alert alert-danger text-center p-4" role="alert">
         <AlertCircle className="mx-auto d-block h-auto w-auto text-danger mb-3" size={48} />
@@ -260,12 +319,128 @@ const App = () => {
       </div>
     );
 
+    const AddProductForm = () => (
+      <div className="card mb-4">
+        <div className="card-header bg-danger text-white">
+          <h5 className="mb-0">Agregar Nuevo Producto</h5>
+        </div>
+        <div className="card-body">
+          <form onSubmit={handleAddProduct}>
+            <div className="row g-3">
+              <div className="col-md-6">
+                <label className="form-label">Nombre del producto *</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={newProduct.nombre}
+                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  required
+                  placeholder="Ej: Sushi Roll California"
+                />
+              </div>
+              <div className="col-md-6">
+                <label className="form-label">Precio *</label>
+                <div className="input-group">
+                  <span className="input-group-text">$</span>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    className="form-control"
+                    value={newProduct.price}
+                    onChange={(e) => handleInputChange('price', e.target.value)}
+                    required
+                    placeholder="0.00"
+                  />
+                </div>
+              </div>
+              <div className="col-md-6">
+                <label className="form-label">Categoría *</label>
+                <select
+                  className="form-select"
+                  value={newProduct.category}
+                  onChange={(e) => handleInputChange('category', e.target.value)}
+                  required
+                >
+                  {categories.map(category => (
+                    <option key={category} value={category}>{category}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="col-md-6">
+                <label className="form-label">Emoji/Icono</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={newProduct.image}
+                  onChange={(e) => handleInputChange('image', e.target.value)}
+                  placeholder="🍣"
+                  maxLength="2"
+                />
+              </div>
+              <div className="col-12">
+                <label className="form-label">Descripción</label>
+                <textarea
+                  className="form-control"
+                  rows="3"
+                  value={newProduct.descripcion}
+                  onChange={(e) => handleInputChange('descripcion', e.target.value)}
+                  placeholder="Describe el producto..."
+                />
+              </div>
+            </div>
+            <div className="d-flex gap-2 mt-3">
+              <button
+                type="submit"
+                disabled={addingProduct || !newProduct.nombre || !newProduct.precioBase}
+                className="btn btn-danger"
+              >
+                {addingProduct ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Agregando...
+                  </>
+                ) : (
+                  <>
+                    <Plus size={16} className="me-2" />
+                    Agregar Producto
+                  </>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowAddForm(false)}
+                className="btn btn-outline-secondary"
+                disabled={addingProduct}
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+
     return (
       <div className="container my-5">
         <div className="text-center mb-4">
           <h2 className="display-5 fw-bold text-dark mb-3">Nuestro Menú</h2>
           <p className="text-muted">Descubre la auténtica cocina japonesa</p>
         </div>
+
+        {/* Botón para mostrar/ocultar formulario */}
+        <div className="text-center mb-4">
+          <button
+            onClick={() => setShowAddForm(!showAddForm)}
+            className="btn btn-outline-danger"
+          >
+            <Plus size={16} className="me-2" />
+            {showAddForm ? 'Ocultar Formulario' : 'Agregar Producto'}
+          </button>
+        </div>
+
+        {/* Formulario para agregar producto */}
+        {showAddForm && <AddProductForm />}
 
         {/* Barra de búsqueda */}
         <div className="mx-auto mb-4" style={{ maxWidth: '500px' }}>

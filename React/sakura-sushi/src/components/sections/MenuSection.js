@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { productService } from '../../services/productService';
-import ProductCard from '../ProductCard';
 
 const MenuSection = ({ addToCart }) => {
   const [products, setProducts] = useState([]);
@@ -35,6 +34,32 @@ const MenuSection = ({ addToCart }) => {
 
     loadProducts();
   }, []);
+
+  const handleAddProduct = async (e) => {
+  e.preventDefault();
+  setAddingProduct(true);
+  
+  try {
+    const productData = {
+      name: newProduct.name.trim(),
+      description: newProduct.description.trim(),
+      price: parseFloat(newProduct.price),
+      category: newProduct.category,
+      image: newProduct.image || '🍣'
+    };
+
+    await createProduct(productData); // Mucho más simple!
+    await refetchProducts();
+    
+    // Reset form...
+    showSuccessMessage('Producto agregado exitosamente!');
+    
+  } catch (error) {
+    showErrorMessage(error.message); // El mensaje ya viene procesado
+  } finally {
+    setAddingProduct(false);
+  }
+};
 
   // Filtrar productos cuando cambia la categoría
   useEffect(() => {

@@ -20,5 +20,6 @@ public class SakuraSushiApplication {
 
 		// 2. Cargar Spring
 		SpringApplication.run(SakuraSushiApplication.class, args);
+
 	}
 }
