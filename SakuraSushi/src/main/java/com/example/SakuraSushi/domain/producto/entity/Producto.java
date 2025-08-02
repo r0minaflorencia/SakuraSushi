@@ -1,12 +1,7 @@
 package com.example.SakuraSushi.domain.producto.entity;
 
-import java.util.List;
-
-import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
-import jakarta.persistence.DiscriminatorType;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,7 +10,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "productos")
-@DiscriminatorColumn(name = "dtype", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorColumn(name = "dtype")
 public abstract class Producto {
 
     @Id
@@ -37,16 +32,12 @@ public abstract class Producto {
     @Column(nullable = false)
     private boolean disponible = true;
 
-    @ElementCollection
-    @CollectionTable(name = "ingredientes")
-    private List<String> ingredientes;
-
     private boolean esPicante = false;
     private boolean esVegetariano = false;
     private boolean esVegano = false;
     private boolean esGlutenFree = false;
 
-    public abstract String getTipoDeProducto();
+    public abstract String getDType();
 
     public abstract String getCategoria();
 
@@ -98,14 +89,6 @@ public abstract class Producto {
 
     public void setDisponible(boolean disponible) {
         this.disponible = disponible;
-    }
-
-    public List<String> getIngredientes() {
-        return ingredientes;
-    }
-
-    public void setIngredientes(List<String> ingredientes) {
-        this.ingredientes = ingredientes;
     }
 
     public boolean isEsPicante() {

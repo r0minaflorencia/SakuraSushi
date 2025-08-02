@@ -53,11 +53,11 @@ export const CartProvider = ({ children }) => {
         setCart([]);
     };
 
-    const getTotalPrice = () => {
+    const getTotalprecioBase = () => {
         return cart.reduce((total, item) => {
-            const price = parseFloat(item.price) || 0;
+            const precioBase = parseFloat(item.precioBase) || 0;
             const quantity = parseInt(item.quantity) || 0;
-            return total + (price * quantity);
+            return total + (precioBase * quantity);
         }, 0).toFixed(2);
     };
 
@@ -70,7 +70,7 @@ export const CartProvider = ({ children }) => {
         addToCart,
         removeFromCart,
         updateQuantity,
-        getTotalPrice,
+        getTotalprecioBase,
         getTotalItems,
         clearCart
     };

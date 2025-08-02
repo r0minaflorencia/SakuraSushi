@@ -16,7 +16,7 @@ public class Maki extends Producto {
     private List<String> toppings; // Semillas de sésamo, etc.
 
     @Override
-    public String getTipoDeProducto() {
+    public String getDType() {
         return "MAKI";
     }
 
@@ -77,6 +77,5 @@ public class Maki extends Producto {
     public void setToppings(List<String> toppings) {
         this.toppings = toppings;
     }
- 
 
 }

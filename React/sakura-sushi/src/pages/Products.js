@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { fetchProducts } from "../services/productService";
-import ProductCard from "../components/ProductCard"; // <-- Importa el componente ProductCard
+import { fetchProducts } from "../services/restaurantService";
+import ProductCard from "../components/ProductCard";
 
 function Products({ products }) {
   // Define la función para agregar productos al carrito
@@ -11,7 +11,7 @@ function Products({ products }) {
 
   return (
     <div>
-      {products.map(product => (
+      {products && products.length > 0 && products.map(product => (
         // Pasa la función `addToCart` como una prop
         <ProductCard key={product.id} product={product} addToCart={addToCart} />
       ))}

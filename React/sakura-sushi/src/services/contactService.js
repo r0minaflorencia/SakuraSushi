@@ -1,7 +1,7 @@
 const contactService = {
   /**
    * Simula el envío de un formulario de contacto a un servidor.
-   * @param {object} formData - Un objeto con los datos del formulario (name, email, message).
+   * @param {object} formData - Un objeto con los datos del formulario (nombre, email, msg).
    * @returns {Promise<object>} Una promesa que se resuelve con un objeto de éxito o falla.
    */
   send: async (formData) => {

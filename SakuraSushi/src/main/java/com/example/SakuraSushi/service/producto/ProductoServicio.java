@@ -1,7 +1,10 @@
 package com.example.SakuraSushi.service.producto;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,17 +26,30 @@ public class ProductoServicio {
     private final ProductoFactory ProductoFactory;
     private final ProductoDtoFactory ProductoDtoFactory;
 
+    public Producto guardarProducto(Producto producto) {
+        return ProductoRepository.save(producto);
+    }
+
     public Producto findProductoById(Long id) throws MyException {
         return ProductoRepository.findById(id)
                 .orElseThrow(() -> new MyException("Producto no encontrado con ID: " + id));
     }
 
-    public List<Producto> obtenerTodos() {
-        return ProductoRepository.findAll();
+    public Page<Producto> obtenerTodos(Pageable pageable) {
+        return ProductoRepository.findAll(pageable);
     }
 
-    public List<Producto> buscarPorCategoria(String productoType) {
-        return ProductoRepository.findByProductoType(productoType);
+    public List<Producto> buscarPorCategoria(String categoria) {
+
+        return ProductoRepository.findAll().stream()
+                .filter(p -> p.getClass().getSimpleName().equalsIgnoreCase(categoria))
+                .collect(Collectors.toList());
+    }
+
+    public List<String> obtenerTodasLasCategorias() {
+        return ProductoRepository.findDistinctProductTypes().stream()
+                .map(Class::getSimpleName)
+                .collect(Collectors.toList());
     }
 
     private ProductoDto convertToDto(Producto Producto) {
@@ -60,7 +76,6 @@ public class ProductoServicio {
         Producto.setPrecioBase(dto.getPrecioBase());
         Producto.setStock(dto.getStock());
         Producto.setDisponible(dto.isDisponible());
-        Producto.setIngredientes(dto.getIngredientes());
         Producto.setEsPicante(dto.isEsPicante());
         Producto.setEsVegetariano(dto.isEsVegetariano());
         Producto.setEsVegano(dto.isEsVegano());

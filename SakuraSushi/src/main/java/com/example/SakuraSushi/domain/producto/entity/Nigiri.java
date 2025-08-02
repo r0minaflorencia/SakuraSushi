@@ -14,7 +14,7 @@ public class Nigiri extends Producto {
     private Boolean tieneWasabi = true;
 
     @Override
-    public String getTipoDeProducto() {
+    public String getDType() {
         return "NIGIRI";
     }
 
@@ -31,7 +31,7 @@ public class Nigiri extends Producto {
         if (toppings != null && !toppings.isEmpty()) {
             precioFinal += toppings.size() * 50; // por topping
         }
-        
+
         return precioFinal;
     }
 
@@ -58,7 +58,5 @@ public class Nigiri extends Producto {
     public void setTieneWasabi(Boolean tieneWasabi) {
         this.tieneWasabi = tieneWasabi;
     }
-
-    
 
 }

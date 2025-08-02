@@ -9,26 +9,21 @@ export const productService = {
   getAll: async () => {
     try {
       const response = await api.get('/productos');
-      return response.data;
+      // Extraer solo el contenido del objeto Page
+      return response.data.content || response.data;
     } catch (error) {
       console.error('Error fetching products:', error);
       throw new Error('No se pudieron cargar los productos');
     }
   },
 
-  // Obtener productos por categoría
-  getByCategory: async (category) => {
+  getProductsByCategoria: async (categoria) => {
     try {
-      // Si es "Todos", obtener todos los productos
-      if (category === 'Todos' || !category) {
-        return await productService.getAll();
-      }
-
-      const response = await api.get(`/productos/categoria/${encodeURIComponent(category)}`);
+      const response = await api.get(`/productos?categoria=${categoria}`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching products by category:', error);
-      throw new Error(`No se pudieron cargar los productos de la categoría ${category}`);
+      console.error(`Error fetching products for category ${categoria}:`, error);
+      throw error;
     }
   },
 
@@ -51,7 +46,7 @@ export const productService = {
       }
 
       const encodedSearchTerm = encodeURIComponent(searchTerm.trim());
-      const response = await api.get(`/productos/busqueda/${encodedSearchTerm}`);
+      const response = await api.get(`/productos/busqueda?q=${encodedSearchTerm}`);
       return response.data;
     } catch (error) {
       console.error('Error searching products:', error);
@@ -71,25 +66,44 @@ export const productService = {
     }
   },
 
-  // Crear nuevo producto (admin)
   create: async (productData) => {
     try {
-      const response = await api.post('/productos', productData);
+      // Validar datos requeridos
+      if (!productData.nombre || !productData.precioBase) {
+        throw new Error('Nombre y precio son campos obligatorios');
+      }
+
+      const dataToSend = {
+        nombre: productData.nombre,
+        descripcion: productData.descripcion || '',
+        precioBase: parseFloat(productData.precioBase),
+        categoria: productData.categoria || 'Sushi',
+        // image: productData.image || '🍣', 
+
+        // ✅ Agregar campos que espera tu backend
+        disponible: productData.disponible || true,
+        esGlutenFree: productData.esGlutenFree || false,
+        esPicante: productData.esPicante || false,
+        esVegano: productData.esVegano || false,
+        esVegetariano: productData.esVegetariano || false,
+      };
+
+      if (isNaN(dataToSend.precioBase) || dataToSend.precioBase <= 0) {
+        throw new Error('El precio debe ser un número mayor a 0');
+      }
+
+      const response = await api.post('/productos', dataToSend);
       return response.data;
     } catch (error) {
       console.error('Error creating product:', error);
-      throw new Error('No se pudo crear el producto');
-    }
-  },
 
-  // Actualizar producto (admin)
-  update: async (productId, productData) => {
-    try {
-      const response = await api.put(`/productos/${productId}`, productData);
-      return response.data;
-    } catch (error) {
-      console.error('Error updating product:', error);
-      throw new Error('No se pudo actualizar el producto');
+      // Extraer mensaje de error más específico
+      const errorMessage = error.response?.data?.message
+        || error.response?.data?.error
+        || error.message
+        || 'Error al crear el producto';
+
+      throw new Error(errorMessage);
     }
   },
 
@@ -104,7 +118,6 @@ export const productService = {
     }
   },
 
-  // Crear nuevo producto
   addToCart: async (productData) => {
     try {
       // Validar datos requeridos
@@ -114,10 +127,10 @@ export const productService = {
 
       // Preparar datos para enviar
       const dataToSend = {
-        nombre: productData.name || productData.nombre,
-        descripcion: productData.description || productData.descripcion || '',
-        precio: parseFloat(productData.price || productData.precioBase),
-        categoria: productData.category || productData.categoria || 'Sushi',
+        nombre: productData.nombre || productData.nombre,
+        descripcion: productData.descripcion || productData.descripcion || '',
+        precio: parseFloat(productData.precioBase || productData.precioBase),
+        categoria: productData.categoria || productData.categoria || 'Sushi',
         imagen: productData.image || productData.imagen || '🍣'
       };
 
@@ -150,10 +163,10 @@ export const productService = {
 
       // Preparar datos para enviar
       const dataToSend = {
-        nombre: productData.name || productData.nombre,
-        descripcion: productData.description || productData.descripcion || '',
-        precio: parseFloat(productData.price || productData.precio),
-        categoria: productData.category || productData.categoria || 'Sushi',
+        nombre: productData.nombre || productData.nombre,
+        descripcion: productData.descripcion || productData.descripcion || '',
+        precio: parseFloat(productData.precioBase || productData.precio),
+        categoria: productData.categoria || productData.categoria || 'Sushi',
         imagen: productData.image || productData.imagen || '🍣'
       };
 
@@ -208,9 +221,9 @@ export const orderService = {
         items: orderData.items.map(item => ({
           productoId: item.id,
           cantidad: item.quantity,
-          precio: item.price,
-          subtotal: item.price * item.quantity,
-          nombre: item.name // Incluir nombre para referencia
+          precio: item.precioBase,
+          subtotal: item.precioBase * item.quantity,
+          nombre: item.nombre // Incluir nombre para referencia
         })),
         total: orderData.total,
         metodoPago: orderData.paymentMethod || 'EFECTIVO',
@@ -375,41 +388,41 @@ export const orderService = {
 // =============================================================================
 // SERVICIO DE CATEGORÍAS
 // =============================================================================
-export const categoryService = {
+export const categoriaService = {
   // Obtener todas las categorías (alias para compatibilidad)
   getAll: async () => {
     return await productService.getCategories();
   },
 
   // Crear nueva categoría (admin)
-  create: async (categoryData) => {
+  create: async (categoriaData) => {
     try {
-      const response = await api.post('/categorias', categoryData);
+      const response = await api.post('/categorias', categoriaData);
       return response.data;
     } catch (error) {
-      console.error('Error creating category:', error);
+      console.error('Error creating categoria:', error);
       throw new Error('No se pudo crear la categoría');
     }
   },
 
   // Actualizar categoría (admin)
-  update: async (categoryId, categoryData) => {
+  update: async (categoriaId, categoriaData) => {
     try {
-      const response = await api.put(`/categorias/${categoryId}`, categoryData);
+      const response = await api.put(`/categorias/${categoriaId}`, categoriaData);
       return response.data;
     } catch (error) {
-      console.error('Error updating category:', error);
+      console.error('Error updating categoria:', error);
       throw new Error('No se pudo actualizar la categoría');
     }
   },
 
   // Eliminar categoría (admin)
-  delete: async (categoryId) => {
+  delete: async (categoriaId) => {
     try {
-      const response = await api.delete(`/categorias/${categoryId}`);
+      const response = await api.delete(`/categorias/${categoriaId}`);
       return response.data;
     } catch (error) {
-      console.error('Error deleting category:', error);
+      console.error('Error deleting categoria:', error);
       throw new Error('No se pudo eliminar la categoría');
     }
   }
@@ -476,28 +489,6 @@ export const customerService = {
 // SERVICIO DE RESTAURANTE Y UTILIDADES
 // =============================================================================
 export const restaurantService = {
-  // Obtener información del restaurante
-  getInfo: async () => {
-    try {
-      const response = await api.get('/restaurante/info');
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching restaurant info:', error);
-      // Devolver información por defecto
-      return {
-        nombre: 'Sakura Sushi',
-        direccion: 'Av. Corrientes 1234, Buenos Aires',
-        telefono: '+54 11 1234-5678',
-        horarios: 'Lun-Dom: 12:00 - 23:00',
-        email: 'info@sakurasushi.com'
-      };
-    }
-  },
-
-  // Buscar productos (alias para compatibilidad)
-  search: async (searchTerm) => {
-    return await productService.search(searchTerm);
-  },
 
   // Verificar disponibilidad para delivery
   checkDeliveryAvailability: async (address) => {
@@ -507,17 +498,6 @@ export const restaurantService = {
     } catch (error) {
       console.error('Error checking delivery availability:', error);
       throw new Error('No se pudo verificar la disponibilidad de delivery');
-    }
-  },
-
-  // Obtener configuración del restaurante
-  getConfig: async () => {
-    try {
-      const response = await api.get('/restaurante/configuracion');
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching restaurant config:', error);
-      throw new Error('No se pudo obtener la configuración');
     }
   },
 
@@ -573,21 +553,21 @@ export const utilService = {
 // EXPORTACIÓN POR DEFECTO (mantiene compatibilidad total)
 // =============================================================================
 export default {
-  // Servicios principales (tu estructura actual)
+  // Servicios principales 
   productService,
   orderService,
   contactService,
   restaurantService,
 
   // Servicios adicionales
-  categoryService,
+  categoriaService,
   customerService,
   utilService,
 
   // Alias para compatibilidad
   products: productService,
   orders: orderService,
-  categories: categoryService,
+  categories: categoriaService,
   customers: customerService,
   contact: contactService,
   restaurant: restaurantService,

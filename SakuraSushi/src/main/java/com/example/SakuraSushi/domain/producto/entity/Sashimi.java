@@ -10,8 +10,9 @@ public class Sashimi extends Producto {
     private String tipoPescado; // Salmón, Atún, etc.
     private Integer piezas = 6;
 
+
     @Override
-    public String getTipoDeProducto() {
+    public String getDType() {
         return "SASHIMI";
     }
 

@@ -2,23 +2,33 @@ package com.example.SakuraSushi.domain.producto.entity;
 
 import java.util.List;
 
+import org.hibernate.annotations.BatchSize;
+
 import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 
 @Entity
 @DiscriminatorValue("COMBO")
 public class Combo extends Producto {
 
-    @ElementCollection
-    private List<Long> productosIncluidosId; // IDs de Productos incluidos
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "combo_productos_incluidos", 
+            joinColumns = @JoinColumn(name = "combo_id"), 
+            inverseJoinColumns = @JoinColumn(name = "producto_id") 
+    )
+    @BatchSize(size = 10)
+    private List<Producto> productosIncluidos; 
     private int porcentajeDescuento = 15; // 15% descuento
     private boolean incluyeSalsaSoja = true;
     private boolean incluyeWasabi = true;
     private boolean incluyeJengibre = true;
 
     @Override
-    public String getTipoDeProducto() {
+    public String getDType() {
         return "COMBO";
     }
 
@@ -36,12 +46,12 @@ public class Combo extends Producto {
         return precioFinal;
     }
 
-    public List<Long> getProductosIncluidosId() {
-        return productosIncluidosId;
+    public List<Producto> getProductosIncluidos() {
+        return productosIncluidos;
     }
 
-    public void setProductosIncluidosId(List<Long> productosIncluidosId) {
-        this.productosIncluidosId = productosIncluidosId;
+    public void setProductosIncluidos(List<Producto> productosIncluidos) {
+        this.productosIncluidos = productosIncluidos;
     }
 
     public int getPorcentajeDescuento() {
@@ -75,7 +85,5 @@ public class Combo extends Producto {
     public void setIncluyeJengibre(boolean incluyeJengibre) {
         this.incluyeJengibre = incluyeJengibre;
     }
-
-    
 
 }

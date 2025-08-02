@@ -1,7 +1,5 @@
 package com.example.SakuraSushi.dto.producto;
 
-import java.util.List;
-
 import lombok.Data;
 
 @Data
@@ -13,7 +11,6 @@ public abstract class ProductoDto {
     private double precioFinal;
     private Integer stock;
     private boolean disponible;
-    private List<String> ingredientes;
     private boolean esPicante;
     private boolean esVegetariano;
     private boolean esVegano;

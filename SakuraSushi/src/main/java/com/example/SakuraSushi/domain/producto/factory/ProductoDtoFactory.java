@@ -17,7 +17,7 @@ import com.example.SakuraSushi.dto.producto.SashimiDto;
 public class ProductoDtoFactory {
 
     public ProductoDto crearDto(Producto producto) {
-        switch (producto.getTipoDeProducto()) {
+        switch (producto.getDType()) {
             case "SASHIMI":
                 return crearSashimiDto((Sashimi) producto);
             case "MAKI":
@@ -27,7 +27,7 @@ public class ProductoDtoFactory {
             case "COMBO":
                 return crearComboDto((Combo) producto);
             default:
-                throw new IllegalArgumentException("Tipo de producto no soportado: " + producto.getTipoDeProducto());
+                throw new IllegalArgumentException("Tipo de producto no soportado: " + producto.getDType());
         }
     }
 
@@ -61,7 +61,7 @@ public class ProductoDtoFactory {
     private ComboDto crearComboDto(Combo combo) {
         ComboDto dto = new ComboDto();
         mapCommonFields(combo, dto);
-        dto.setProductosIncluidosId(combo.getProductosIncluidosId());
+        dto.setProductosIncluidos(combo.getProductosIncluidos());
         dto.setPorcentajeDescuento(combo.getPorcentajeDescuento());
         dto.setIncluyeSalsaSoja(combo.isIncluyeSalsaSoja());
         dto.setIncluyeWasabi(combo.isIncluyeWasabi());
@@ -77,12 +77,11 @@ public class ProductoDtoFactory {
         dto.setPrecioFinal(producto.calcularPrecioFinal());
         dto.setStock(producto.getStock());
         dto.setDisponible(producto.isDisponible());
-        dto.setIngredientes(producto.getIngredientes());
         dto.setEsPicante(producto.isEsPicante());
         dto.setEsVegetariano(producto.isEsVegetariano());
         dto.setEsVegano(producto.isEsVegano());
         dto.setEsGlutenFree(producto.isEsGlutenFree());
         dto.setCategoria(producto.getCategoria());
-        dto.setTipoDeProducto(producto.getTipoDeProducto());
+        dto.setTipoDeProducto(producto.getDType());
     }
 }

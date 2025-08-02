@@ -2,6 +2,8 @@ package com.example.SakuraSushi.persistence.producto;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,14 +17,15 @@ public interface ProductoRepositorio extends JpaRepository<Producto, Long> {
        // Búsquedas básicas
        List<Producto> findByDisponibleTrue();
 
-       List<Producto> findByDisponibleTrueOrderByStockDesc();
+       @Query("SELECT DISTINCT TYPE(p) FROM Producto p")
+       List<Class<? extends Producto>> findDistinctProductTypes();
 
-       // Búsquedas por tipo de Producto
-       @Query("SELECT p FROM Producto p WHERE TYPE(p) = :ProductoClass")
-       List<Producto> findByProductoType(@Param("ProductoClass") Class<? extends Producto> ProductoClass);
+       @Query(value = "SELECT p FROM Producto p LEFT JOIN FETCH p.productosIncluidos pi " +
+                     "WHERE TYPE(p) = Combo", countQuery = "SELECT COUNT(p) FROM Producto p")
+       Page<Producto> findAllWithComboDetails(Pageable pageable);
 
-       @Query("SELECT p FROM Producto p WHERE p.class = :ProductoType")
-       List<Producto> findByProductoType(@Param("ProductoType") String ProductoType);
+       @Query("SELECT p FROM Producto p WHERE p.class = :categoria")
+       List<Producto> findBycategoria(@Param("categoria") String categoria);
 
        // Búsquedas por características dietéticas
        @Query("SELECT p FROM Producto p WHERE " +
@@ -46,15 +49,10 @@ public interface ProductoRepositorio extends JpaRepository<Producto, Long> {
        // Búsquedas por precio
        List<Producto> findByPrecioBaseBetween(double minPrecio, double maxPrecio);
 
-       // Búsquedas por ingredientes
-       @Query("SELECT p FROM Producto p JOIN p.ingredientes i WHERE LOWER(i) LIKE LOWER(CONCAT('%', :ingrediente, '%'))")
-       List<Producto> findByIngrediente(@Param("ingrediente") String ingredientes);
-
        // Búsqueda avanzada
        @Query("SELECT p FROM Producto p WHERE " +
                      "LOWER(p.nombre) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
-                     "LOWER(p.descripcion) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
-                     "EXISTS (SELECT i FROM p.ingredientes i WHERE LOWER(i) LIKE LOWER(CONCAT('%', :searchTerm, '%')))")
+                     "LOWER(p.descripcion) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
        List<Producto> searchProductos(@Param("searchTerm") String searchTerm);
 
 }
