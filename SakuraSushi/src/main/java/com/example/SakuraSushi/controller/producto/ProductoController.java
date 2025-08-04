@@ -72,9 +72,8 @@ public class ProductoController {
         return productoServicio.buscarPorCategoria(categoria);
     }
 
-    @GetMapping("/busqueda/{searchTerm}")
-    public List<Producto> searchProducts(@RequestParam String searchTerm) {
+    @GetMapping("/busqueda")
+    public List<Producto> searchProducts(@RequestParam("q") String searchTerm) {
         return productoServicio.buscarPorTermino(searchTerm);
     }
-
 }

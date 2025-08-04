@@ -9,7 +9,6 @@ import Navigation from './components/Navigation';
 import ProductCard from './components/ProductCard';
 import AboutSection from './components/sections/AboutSection';
 
-
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -63,30 +62,40 @@ const App = () => {
   // Carga inicial - SOLO UNA VEZ
   useEffect(() => {
     if (!initialLoadDone) {
+      console.log('Cargando datos iniciales...');
       loadInitialData(); // Carga productos y categorías
       setInitialLoadDone(true);
     }
   }, []); // Array vacío
 
-  // Manejo de cambios - SIN CARGAR AL INICIO
+  // Manejo de cambios - CORREGIDO
   useEffect(() => {
     if (!initialLoadDone) return; // No hacer nada hasta carga inicial
 
+    console.log('Efecto de filtrado:', { searchTerm, selectedcategoria });
+
     if (searchTerm) {
+      console.log('Buscando productos con término:', searchTerm);
       searchProducts(searchTerm);
-    } else if (selectedcategoria !== 'Todos') {
+    } else if (selectedcategoria === 'Todos') {
+      console.log('Cargando todos los productos');
+      loadInitialData(); // Cargar todos los productos
+    } else {
+      console.log('Cargando productos por categoría:', selectedcategoria);
       loadProductsBycategoria(selectedcategoria);
     }
   }, [selectedcategoria, searchTerm, initialLoadDone]);
 
   // Funciones auxiliares
   const handlecategoriaChange = (categoria) => {
+    console.log('Cambiando categoría de', selectedcategoria, 'a', categoria);
     setSelectedcategoria(categoria);
     setSearchTerm(''); // Limpia el término de búsqueda al cambiar de categoría
   };
 
   const handleSearchChange = (e) => {
     const term = e.target.value;
+    console.log('Cambiando término de búsqueda a:', term);
     setSearchTerm(term);
     if (term) {
       setSelectedcategoria('Todos'); // Limpia la categoría seleccionada al buscar
@@ -125,6 +134,19 @@ const App = () => {
 
   const showErrorMessage = (message) => {
     alert(`❌ ${message}`);
+  };
+
+  // Función para refetch que también resetea filtros si es necesario
+  const handleRefetchProducts = async () => {
+    console.log('Refetch solicitado');
+    await refetchProducts();
+    
+    // Si estamos en una categoría específica o búsqueda, refrescar esos filtros
+    if (searchTerm) {
+      await searchProducts(searchTerm);
+    } else if (selectedcategoria !== 'Todos') {
+      await loadProductsBycategoria(selectedcategoria);
+    }
   };
 
   const CartSection = () => {
@@ -233,6 +255,16 @@ const App = () => {
     );
   };
 
+  // DEBUG: Agregar información de estado en desarrollo
+  console.log('App state:', {
+    products: products?.length,
+    selectedcategoria,
+    searchTerm,
+    initialLoadDone,
+    productsLoading,
+    productsError
+  });
+
   // Renderizado principal
   return (
     <div className="App-container bg-light">
@@ -252,7 +284,7 @@ const App = () => {
       <main>
         {activeSection === 'menu' && (
           <MenuSection
-            refetchProducts={refetchProducts}
+            refetchProducts={handleRefetchProducts}
             showSuccessMessage={showSuccessMessage}
             showErrorMessage={showErrorMessage}
             // Pasar también los datos necesarios

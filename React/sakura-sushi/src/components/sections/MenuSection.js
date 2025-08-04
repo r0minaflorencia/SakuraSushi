@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import restaurantService from '../../services/restaurantService';
+import '../../index.css'; 
 
 const MenuSection = ({
   refetchProducts,
@@ -27,6 +28,15 @@ const MenuSection = ({
     precioBase: '',
     categoria: 'Sushi',
     image: '🍣'
+  });
+
+  // Debug: Agregar console.log para verificar props
+  console.log('MenuSection props:', {
+    products,
+    productsLoading,
+    productsError,
+    selectedcategoria,
+    searchTerm
   });
 
   // Manejar cambios en los inputs
@@ -61,6 +71,8 @@ const MenuSection = ({
         esVegetariano: false,
         stock: 1
       };
+
+      console.log('Enviando producto:', productData);
 
       // Llamar al servicio para crear el producto
       await restaurantService.create(productData);
@@ -118,15 +130,24 @@ const MenuSection = ({
   return (
     <div className="container my-5">
       {/* Header con búsqueda y botón para agregar producto */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="display-5 fw-bold text-dark">Nuestro Menú</h2>
-        <button
-          onClick={() => setShowAddForm(true)}
-          className="btn btn-primary"
-          disabled={addingProduct}
-        >
-          Agregar Producto
-        </button>
+      <div className="row mb-4">
+        <div className="col-md-8">
+          <h2 className="display-5 fw-bold text-dark">Nuestro Menú</h2>
+        </div>
+        <div className="col-md-4 text-end">
+          <button
+            onClick={() => {
+              console.log('Botón Agregar Producto clickeado');
+              setShowAddForm(true);
+            }}
+            className="btn btn-primary btn-lg"
+            disabled={addingProduct}
+            style={{ minWidth: '160px' }}
+          >
+            <i className="fas fa-plus me-2"></i>
+            Agregar Producto
+          </button>
+        </div>
       </div>
 
       {/* Barra de búsqueda */}
@@ -137,7 +158,7 @@ const MenuSection = ({
               type="text"
               className="form-control"
               placeholder="Buscar productos..."
-              value={searchTerm}
+              value={searchTerm || ''}
               onChange={handleSearchChange}
             />
             <span className="input-group-text">
@@ -149,10 +170,11 @@ const MenuSection = ({
 
       {/* Formulario para agregar producto */}
       {showAddForm && (
-        <div className="card mb-4">
+        <div className="card mb-4 border-primary">
+          <div className="card-header bg-primary text-white">
+            <h3 className="card-title h5 mb-0">Agregar Nuevo Producto</h3>
+          </div>
           <div className="card-body">
-            <h3 className="card-title h5 mb-3">Agregar Nuevo Producto</h3>
-
             <form onSubmit={handleAddProduct}>
               <div className="row g-3">
                 <div className="col-md-6">
@@ -259,7 +281,10 @@ const MenuSection = ({
           {['Todos', 'Maki', 'Sashimi', 'Nigiri', 'Combo'].map((categoria) => (
             <button
               key={categoria}
-              onClick={() => handlecategoriaChange(categoria)}
+              onClick={() => {
+                console.log('Cambiando categoría a:', categoria);
+                handlecategoriaChange(categoria);
+              }}
               className={`btn ${selectedcategoria === categoria
                 ? 'btn-danger'
                 : 'btn-outline-danger'
@@ -269,6 +294,11 @@ const MenuSection = ({
             </button>
           ))}
         </div>
+        {/* Debug info */}
+        <small className="text-muted">
+          Categoría seleccionada: {selectedcategoria || 'ninguna'} |
+          Total productos: {products ? products.length : 0}
+        </small>
       </div>
 
       {/* Estados de carga y error */}
@@ -298,7 +328,7 @@ const MenuSection = ({
         <>
           {products && products.length > 0 ? (
             <div className="row g-4">
-              {products && products.length > 0 && products.map((product) => (
+              {products.map((product) => (
                 <ProductCard
                   key={product.id}
                   product={product}
