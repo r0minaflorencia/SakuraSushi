@@ -77,10 +77,9 @@ export const productService = {
         nombre: productData.nombre,
         descripcion: productData.descripcion || '',
         precioBase: parseFloat(productData.precioBase),
-        categoria: productData.categoria || 'Sushi',
+        dtype: productData.dtype,
         // image: productData.image || '🍣', 
 
-        // ✅ Agregar campos que espera tu backend
         disponible: productData.disponible || true,
         esGlutenFree: productData.esGlutenFree || false,
         esPicante: productData.esPicante || false,
@@ -91,6 +90,8 @@ export const productService = {
       if (isNaN(dataToSend.precioBase) || dataToSend.precioBase <= 0) {
         throw new Error('El precio debe ser un número mayor a 0');
       }
+
+      console.log('Datos finales a enviar al backend (desde restaurantService):', dataToSend);
 
       const response = await api.post('/productos', dataToSend);
       return response.data;

@@ -1,5 +1,9 @@
 package com.example.SakuraSushi.domain.producto.entity;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Entity;
@@ -9,6 +13,20 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
+// Anotaciones de Jackson para deserialización polimórfica:
+// Le dice a Jackson cómo identificar qué subclase concreta instanciar
+// basándose en una propiedad del JSON (en este caso, 'dtype').
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, // Usa el nombre de la subclase (o el valor 'name' en @JsonSubTypes)
+        include = JsonTypeInfo.As.PROPERTY, // La información del tipo se incluye como una propiedad JSON
+        property = "dtype" // El nombre de la propiedad JSON que contiene el valor del tipo (ej. "Maki",
+                           // "Combo")
+)
+@JsonSubTypes({
+        @Type(value = Maki.class, name = "Maki"),
+        @Type(value = Nigiri.class, name = "Nigiri"),
+        @Type(value = Combo.class, name = "Combo"),
+        @Type(value = Sashimi.class, name = "Sashimi")
+})
 @Table(name = "productos")
 @DiscriminatorColumn(name = "dtype")
 public abstract class Producto {

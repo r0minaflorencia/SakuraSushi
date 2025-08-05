@@ -26,7 +26,7 @@ const MenuSection = ({
     nombre: '',
     descripcion: '',
     precioBase: '',
-    categoria: 'Sushi',
+    categoria: 'Maki',
     image: '🍣'
   });
 
@@ -62,20 +62,19 @@ const MenuSection = ({
         nombre: newProduct.nombre.trim(),
         descripcion: newProduct.descripcion.trim(),
         precioBase: parseFloat(newProduct.precioBase),
-        categoria: newProduct.categoria,
+        dtype: newProduct.categoria,
         image: newProduct.image || '🍣',
         disponible: true,
         esGlutenFree: false,
         esPicante: false,
         esVegano: false,
-        esVegetariano: false,
-        stock: 1
+        esVegetariano: false
       };
 
       console.log('Enviando producto:', productData);
 
       // Llamar al servicio para crear el producto
-      await restaurantService.create(productData);
+      await restaurantService.productService.create(productData);
 
       // Refrescar la lista de productos
       if (refetchProducts) {
@@ -87,7 +86,7 @@ const MenuSection = ({
         nombre: '',
         descripcion: '',
         precioBase: '',
-        categoria: 'Sushi',
+        categoria: 'Maki',
         image: '🍣'
       });
 
@@ -121,7 +120,7 @@ const MenuSection = ({
       nombre: '',
       descripcion: '',
       precioBase: '',
-      categoria: 'Sushi',
+      categoria: 'Maki',
       image: '🍣'
     });
     setShowAddForm(false);
