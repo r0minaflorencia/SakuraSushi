@@ -16,5 +16,9 @@ public class ComboDto extends ProductoDto {
     private boolean incluyeSalsaSoja;
     private boolean incluyeWasabi;
     private boolean incluyeJengibre;
+
+      public ComboDto() {
+        setDType("COMBO"); 
+    }
     
 }

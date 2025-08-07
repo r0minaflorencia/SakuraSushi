@@ -9,5 +9,9 @@ public class SashimiDto extends ProductoDto {
 
     private String tipoPescado;
     private Integer piezas;
-    
+
+    public SashimiDto() {
+        setDType("SASHIMI"); 
+    }
+
 }

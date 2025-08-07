@@ -9,9 +9,9 @@ import jakarta.persistence.Entity;
 @DiscriminatorValue("NIGIRI")
 public class Nigiri extends Producto {
 
-    private List<String> toppings; // Salmón, Atún, Camarón, etc.
-    private Integer piezas = 2;
-    private Boolean tieneWasabi = true;
+    private List<String> toppings;
+    private Integer piezas;
+    private boolean tieneWasabi;
 
     @Override
     public String getDType() {

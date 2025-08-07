@@ -26,17 +26,8 @@ const MenuSection = ({
     nombre: '',
     descripcion: '',
     precioBase: '',
-    categoria: 'Maki',
+    categoria: 'General',
     image: '🍣'
-  });
-
-  // Debug: Agregar console.log para verificar props
-  console.log('MenuSection props:', {
-    products,
-    productsLoading,
-    productsError,
-    selectedcategoria,
-    searchTerm
   });
 
   // Manejar cambios en los inputs
@@ -62,7 +53,7 @@ const MenuSection = ({
         nombre: newProduct.nombre.trim(),
         descripcion: newProduct.descripcion.trim(),
         precioBase: parseFloat(newProduct.precioBase),
-        dtype: newProduct.categoria,
+        dType: newProduct.categoria.toUpperCase(),
         image: newProduct.image || '🍣',
         disponible: true,
         esGlutenFree: false,
@@ -86,7 +77,7 @@ const MenuSection = ({
         nombre: '',
         descripcion: '',
         precioBase: '',
-        categoria: 'Maki',
+        categoria: 'General',
         image: '🍣'
       });
 
@@ -212,6 +203,7 @@ const MenuSection = ({
                     onChange={(e) => handleInputChange('categoria', e.target.value)}
                     disabled={addingProduct}
                   >
+                    <option value="General">General</option>
                     <option value="Maki">Maki</option>
                     <option value="Sashimi">Sashimi</option>
                     <option value="Nigiri">Nigiri</option>

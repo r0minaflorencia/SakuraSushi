@@ -8,7 +8,7 @@ import jakarta.persistence.Entity;
 public class Sashimi extends Producto {
 
     private String tipoPescado; // Salmón, Atún, etc.
-    private Integer piezas = 6;
+    private Integer piezas;
 
 
     @Override

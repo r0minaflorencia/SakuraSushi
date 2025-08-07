@@ -41,14 +41,17 @@ public abstract class Producto {
     @Column(length = 1000)
     private String descripcion;
 
-    @Column
+    @Column(nullable = false)
     private double precioBase;
 
     @Column(nullable = false)
-    private int stock = 0;
+    private int stock;
 
     @Column(nullable = false)
     private boolean disponible = true;
+
+    @Column
+    private String categoria;
 
     private boolean esPicante = false;
     private boolean esVegetariano = false;
@@ -56,8 +59,6 @@ public abstract class Producto {
     private boolean esGlutenFree = false;
 
     public abstract String getDType();
-
-    public abstract String getCategoria();
 
     public abstract double calcularPrecioFinal();
 
@@ -139,6 +140,14 @@ public abstract class Producto {
 
     public void setEsGlutenFree(boolean esGlutenFree) {
         this.esGlutenFree = esGlutenFree;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
     }
 
 }

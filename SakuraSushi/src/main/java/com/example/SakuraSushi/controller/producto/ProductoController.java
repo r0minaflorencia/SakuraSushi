@@ -1,10 +1,9 @@
 package com.example.SakuraSushi.controller.producto;
 
+import java.net.URI;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -17,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.example.SakuraSushi.domain.producto.entity.Producto;
+import com.example.SakuraSushi.dto.producto.ProductoDto;
 import com.example.SakuraSushi.service.producto.ProductoServicio;
 
 @RestController
@@ -26,38 +27,47 @@ import com.example.SakuraSushi.service.producto.ProductoServicio;
 @RequestMapping("/productos")
 public class ProductoController {
 
-    @Autowired
-    private ProductoServicio productoServicio;
+    private final ProductoServicio productoServicio;
+
+    public ProductoController(ProductoServicio productoServicio) {
+        this.productoServicio = productoServicio;
+    }
 
     @GetMapping
-    public ResponseEntity<Page<Producto>> getProducts(
+    public ResponseEntity<Page<ProductoDto>> getProducts(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) String categoria) {
+            @RequestParam(defaultValue = "10") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<Producto> productos;
+        // Llama al servicio, que se encarga de la lógica de paginación
+        // y del mapeo a DTOs.
+        Page<ProductoDto> productosPaginados = productoServicio.obtenerTodos(pageable);
 
-        if (categoria != null && !categoria.isEmpty()) {
-            // Convertir List a Page
-            List<Producto> listaProductos = productoServicio.buscarPorCategoria(categoria);
-            int start = (int) pageable.getOffset();
-            int end = Math.min((start + pageable.getPageSize()), listaProductos.size());
-            List<Producto> pageContent = listaProductos.subList(start, end);
-            productos = new PageImpl<>(pageContent, pageable, listaProductos.size());
-        } else {
-            productos = productoServicio.obtenerTodos(pageable);
-        }
-
-        return ResponseEntity.ok(productos);
+        // Retorna el resultado con un código de estado 200 OK
+        return ResponseEntity.ok(productosPaginados);
     }
 
     @PostMapping
-    public ResponseEntity<Producto> createProduct(@RequestBody Producto producto) {
+    public ResponseEntity<ProductoDto> createProduct(@RequestBody ProductoDto dto) {
         try {
-            Producto nuevoProducto = productoServicio.guardarProducto(producto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(nuevoProducto);
+            Producto nuevoProducto = productoServicio.guardarProducto(dto); // El servicio devuelve la entidad
+                                                                                  // guardada
+
+            // Convierte la entidad guardada de nuevo a DTO para la respuesta
+            ProductoDto responseDto = productoServicio.convertEntityToDto(nuevoProducto);
+
+            URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                    .path("/{id}")
+                    .buildAndExpand(responseDto.getId()) // Usar el ID del DTO de respuesta
+                    .toUri();
+
+            return ResponseEntity.created(location).body(responseDto); // Devuelve el DTO en el cuerpo
+
         } catch (Exception e) {
+            System.err.println("Error al crear producto: " + e.getMessage());
+            e.printStackTrace(); // Imprime la traza completa para depuración
+            // Devuelve un ResponseEntity con un mensaje de error o un DTO vacío si es
+            // necesario
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }

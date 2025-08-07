@@ -9,10 +9,7 @@ import jakarta.persistence.Entity;
 @DiscriminatorValue("MAKI")
 public class Maki extends Producto {
 
-    private String relleno; // Salmón, Atún, Pepino, etc.
-    private Integer piezas = 8;
-    private String arrozTipo = "Sushi Arroz";
-    private String tipoNori = "Alga Nori Premium";
+    private Integer piezas;
     private List<String> toppings; // Semillas de sésamo, etc.
 
     @Override
@@ -38,36 +35,12 @@ public class Maki extends Producto {
         return precioFinal;
     }
 
-    public String getRelleno() {
-        return relleno;
-    }
-
-    public void setRelleno(String relleno) {
-        this.relleno = relleno;
-    }
-
     public Integer getPiezas() {
         return piezas;
     }
 
     public void setPiezas(Integer piezas) {
         this.piezas = piezas;
-    }
-
-    public String getArrozTipo() {
-        return arrozTipo;
-    }
-
-    public void setArrozTipo(String arrozTipo) {
-        this.arrozTipo = arrozTipo;
-    }
-
-    public String getTipoNori() {
-        return tipoNori;
-    }
-
-    public void setTipoNori(String tipoNori) {
-        this.tipoNori = tipoNori;
     }
 
     public List<String> getToppings() {

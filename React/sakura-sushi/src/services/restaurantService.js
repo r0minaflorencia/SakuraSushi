@@ -4,7 +4,6 @@ import api from './api';
 // SERVICIO DE PRODUCTOS
 // =============================================================================
 export const productService = {
-
   // Obtener todos los productos
   getAll: async () => {
     try {
@@ -62,10 +61,11 @@ export const productService = {
     } catch (error) {
       console.error('Error fetching categories:', error);
       // Fallback a categorías por defecto
-      return ['Maki', 'Nigiri', 'Sashimi', 'Combo'];
+      return ['Maki', 'Nigiri', 'Sashimi', 'Combo', 'General'];
     }
   },
 
+  // Crear producto
   create: async (productData) => {
     try {
       // Validar datos requeridos
@@ -77,9 +77,8 @@ export const productService = {
         nombre: productData.nombre,
         descripcion: productData.descripcion || '',
         precioBase: parseFloat(productData.precioBase),
-        dtype: productData.dtype,
+        dType: productData.dType,
         // image: productData.image || '🍣', 
-
         disponible: productData.disponible || true,
         esGlutenFree: productData.esGlutenFree || false,
         esPicante: productData.esPicante || false,
@@ -108,53 +107,6 @@ export const productService = {
     }
   },
 
-  // Eliminar producto (admin)
-  delete: async (productId) => {
-    try {
-      const response = await api.delete(`/productos/${productId}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error deleting product:', error);
-      throw new Error('No se pudo eliminar el producto');
-    }
-  },
-
-  addToCart: async (productData) => {
-    try {
-      // Validar datos requeridos
-      if (!productData.nombre || !productData.precioBase) {
-        throw new Error('Nombre y precio son campos obligatorios');
-      }
-
-      // Preparar datos para enviar
-      const dataToSend = {
-        nombre: productData.nombre || productData.nombre,
-        descripcion: productData.descripcion || productData.descripcion || '',
-        precio: parseFloat(productData.precioBase || productData.precioBase),
-        categoria: productData.categoria || productData.categoria || 'Sushi',
-        imagen: productData.image || productData.imagen || '🍣'
-      };
-
-      // Validar que el precio sea válido
-      if (isNaN(dataToSend.precioBase) || dataToSend.precioBase <= 0) {
-        throw new Error('El precio debe ser un número mayor a 0');
-      }
-
-      const response = await api.post('/productos', dataToSend);
-      return response.data;
-    } catch (error) {
-      console.error('Error creating product:', error);
-
-      // Extraer mensaje de error más específico
-      const errorMessage = error.response?.data?.message
-        || error.response?.data?.error
-        || error.message
-        || 'Error al crear el producto';
-
-      throw new Error(errorMessage);
-    }
-  },
-
   // Actualizar producto existente
   update: async (productId, productData) => {
     try {
@@ -164,15 +116,19 @@ export const productService = {
 
       // Preparar datos para enviar
       const dataToSend = {
-        nombre: productData.nombre || productData.nombre,
-        descripcion: productData.descripcion || productData.descripcion || '',
-        precio: parseFloat(productData.precioBase || productData.precio),
-        categoria: productData.categoria || productData.categoria || 'Sushi',
-        imagen: productData.image || productData.imagen || '🍣'
+        nombre: productData.nombre,
+        descripcion: productData.descripcion || '',
+        precioBase: parseFloat(productData.precioBase || productData.precio),
+        dType: productData.dType || productData.categoria?.toUpperCase(),
+        disponible: productData.disponible !== undefined ? productData.disponible : true,
+        esGlutenFree: productData.esGlutenFree || false,
+        esPicante: productData.esPicante || false,
+        esVegano: productData.esVegano || false,
+        esVegetariano: productData.esVegetariano || false,
       };
 
       // Validar que el precio sea válido si se proporciona
-      if (dataToSend.precio && (isNaN(dataToSend.precio) || dataToSend.precio <= 0)) {
+      if (dataToSend.precioBase && (isNaN(dataToSend.precioBase) || dataToSend.precioBase <= 0)) {
         throw new Error('El precio debe ser un número mayor a 0');
       }
 
@@ -188,8 +144,18 @@ export const productService = {
 
       throw new Error(errorMessage);
     }
-  }
+  },
 
+  // Eliminar producto (admin)
+  delete: async (productId) => {
+    try {
+      const response = await api.delete(`/productos/${productId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      throw new Error('No se pudo eliminar el producto');
+    }
+  }
 };
 
 // =============================================================================
@@ -553,7 +519,7 @@ export const utilService = {
 // =============================================================================
 // EXPORTACIÓN POR DEFECTO (mantiene compatibilidad total)
 // =============================================================================
-export default {
+const restaurantServices = {
   // Servicios principales 
   productService,
   orderService,
@@ -574,3 +540,5 @@ export default {
   restaurant: restaurantService,
   utils: utilService
 };
+
+export default restaurantServices;
