@@ -1,0 +1,8 @@
+footer a:hover {
+    color: #f8d7da !important;
+    transition: color 0.2s ease-in-out;
+}
+
+footer .text-muted:hover {
+    color: #adb5bd !important;
+}

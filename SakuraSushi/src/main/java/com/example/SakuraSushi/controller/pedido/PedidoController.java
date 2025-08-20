@@ -16,7 +16,7 @@ import com.example.SakuraSushi.util.enums.EstadoPedido;
 import com.example.SakuraSushi.util.exception.MyException;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:5173")
 public class PedidoController {
 
     @Autowired

@@ -1,0 +1,191 @@
+/* Estilos para el carrito */
+.cart-item {
+  transition: all 0.3s ease;
+  border: 1px solid #e9ecef;
+}
+
+.cart-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.cart-items {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.cart-items::-webkit-scrollbar {
+  width: 6px;
+}
+
+.cart-items::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.cart-items::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.cart-items::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Animaciones */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.cart-item {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.checkout-form {
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* Botones con efectos hover */
+.btn-quantity {
+  transition: all 0.2s ease;
+}
+
+.btn-quantity:hover {
+  transform: scale(1.05);
+}
+
+.btn-quantity:active {
+  transform: scale(0.95);
+}
+
+/* Card del resumen */
+.card {
+  border: none;
+  border-radius: 12px;
+}
+
+.card-header {
+  background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+  border-radius: 12px 12px 0 0 !important;
+  border-bottom: 1px solid #e9ecef;
+}
+
+/* Estados del carrito */
+.empty-cart-state {
+  min-height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.confirmation-state {
+  min-height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .cart-item .row {
+    margin: 0;
+  }
+  
+  .cart-item .col-3,
+  .cart-item .col-6,
+  .cart-item .col-3 {
+    padding: 0 8px;
+  }
+  
+  .btn-group .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* Efectos de loading */
+.loading-spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Badge del carrito */
+.cart-badge {
+  background: linear-gradient(45deg, #dc3545, #c82333);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Form styles */
+.form-control:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.form-select:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Success states */
+.success-icon {
+  color: #28a745;
+  animation: bounceIn 0.5s ease-out;
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

@@ -23,7 +23,7 @@ import com.example.SakuraSushi.dto.producto.ProductoDto;
 import com.example.SakuraSushi.service.producto.ProductoServicio;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/productos")
 public class ProductoController {
 

@@ -124,6 +124,7 @@ public class ProductoServicio {
      * Método de ejemplo para convertir Entidad a DTO (para la respuesta del
      * controlador)
      */
+    @SuppressWarnings("null")
     public ProductoDto convertEntityToDto(Producto entity) {
 
         ProductoDto dto = null;
